@@ -3,8 +3,11 @@
 
 <include servo lib>
 
-bind pins for all outputs
-create gas servo
+int enginePin = 7;
+int gasPin = 6;
+int brakeVPin = 3;
+int brakeVPin = 3;
+int brakeVPin = 3;
 
 setup {
 	start the serial com port
