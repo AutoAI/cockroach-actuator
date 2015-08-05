@@ -5,23 +5,23 @@
 const int ENGINE_PIN = 7;
 const int GAS_PIN = 6;
 
-const int BRAKING_VELOCITY_PIN = 3;
-const int BRAKING_DIRECTION_PIN = 2;
+const int BRAKING_VELOCITY_PIN = 5;
+const int BRAKING_DIRECTION_PIN = 4;
 const int BRAKING_SENSE_PIN = 1;
 
-const int STEERING_VELOCITY_PIN = 5;
-const int STEERING_DIRECTION_PIN = 4;
+const int STEERING_VELOCITY_PIN = 3;
+const int STEERING_DIRECTION_PIN = 2;
 const int STEERING_SENSE_PIN = 0;
 
 int steeringPosition = 0;
 int brakingPosition = 0;
 
-int steeringGoal = 0;
-int brakingGoal = 0;
+int steeringGoal = 512;
+int brakingGoal = 512;
 int accelerationGoal = 0;
 
-boolean steeringChanged = false;
-boolean brakingChanged = false;
+boolean steeringChanged = true;
+boolean brakingChanged = true;
 boolean accelerationChanged = false;
 
 int power = 255;
