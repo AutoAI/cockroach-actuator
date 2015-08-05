@@ -21,12 +21,13 @@ int steeringGoal = 512;
 int brakingGoal = 0;
 int accelerationGoal = 0;
 
-boolean steeringFlag = false;
-boolean brakingFlag = false;
-boolean accelerationFlag = false;
+boolean steeringChanged = false;
+boolean brakingChanged = false;
+boolean accelerationChanged = false;
 
 int power = 255;
 int threshold = 25;
+int angle = 0;
 
 setup {
 	Servo gas; //create the servo object
@@ -46,19 +47,16 @@ loop {
 	if(serial is available for reading)
 		decodeInput(Serial.read());
 		
-	if (steeringFlag) {
-		doSteering(steeringGoal);
-		}
+	if (steeringChanged) {
+		setSteering(steeringGoal);
 	}
 	
-	if (brakingFlag) {
-		doBraking(brakingGoal);
-		}
+	if (brakingChanged) {
+		setBrake(brakingGoal);
 	}
 	
-	if (accelerationFlag) {
-		doAcceleration(acclerationGoal);
-		}
+	if (accelerationChanged) {
+		setAcceleration(acclerationGoal);
 	}
 	
 	delay(10);
@@ -69,20 +67,20 @@ int decodeInput(int input) {
   int value = input & 0x3F; //take only the last 6 bits
   if (function == 1) {
     steeringGoal = value * 16;
-    steeringFlag = true;
+    steeringChanged = true;
   } else if (function == 2) {
       accelerationGoal = value;
-      accelerationFlag = true;
+      accelerationChanged = true;
   } else if (function == 3) {
       brakingGoal = value * 16;
-      brakingFlag = true;
+      brakingChanged = true;
   } else {
     digitalWrite(enginePin, LOW);
     Serial.println("Killing Engine!");
   }
 }
 
-void doSteering(int goal) {
+void setSteering(int goal) {
 	steeringPos = analogRead(STEERINGSENSEPIN);
 	if (steeringPos < goal - threshold) { // always move toward the value
     		digitalWrite(STEERINGDPIN, HIGH);
@@ -96,7 +94,7 @@ void doSteering(int goal) {
     	}
 }
 
-void doBraking(int goal) {
+void setBrake(int goal) {
 	brakingPos = analogRead(BRAKINGSENSEPIN);
 	if (brakingPos < goal - threshold) { // always move toward the value
     		digitalWrite(BRAKINGDPIN, HIGH);
@@ -110,7 +108,13 @@ void doBraking(int goal) {
     	}
 }
 
-void doAcceleration(int goal) {
-	
+void setAcceleration(int goal) {
+	if (angle < AccelerationGoal*2) { // always move toward the value
+		gas.write(angle);
+   		angle++;
+  	} else if (angle > AccelerationGoal*2) {
+    		gas.write(angle);
+    		angle--;
+  	}
 }
 ```
