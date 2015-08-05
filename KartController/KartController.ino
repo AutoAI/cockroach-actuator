@@ -1,13 +1,13 @@
 //CODE FOR CONTROLLING THE GO-KART
 
-<include servo.h>
+#include <Servo.h>
 
 const int ENGINE_PIN = 7;
 const int GAS_PIN = 6;
 
-const int BRAKE_VELOCITY_PIN = 3;
-const int BRAKE_DIRECTION_PIN = 2;
-const int BRAKE_SENSE_PIN = 1;
+const int BRAKING_VELOCITY_PIN = 3;
+const int BRAKING_DIRECTION_PIN = 2;
+const int BRAKING_SENSE_PIN = 1;
 
 const int STEERING_VELOCITY_PIN = 5;
 const int STEERING_DIRECTION_PIN = 4;
@@ -28,8 +28,10 @@ int power = 255;
 int threshold = 25;
 int angle = 0;
 
-void setup {
-    Servo gas; //create the servo object
+Servo gas;
+
+void setup() {
+     //create the servo object
     gas.attach(GAS_PIN); //bind it to the throttle pin
 
     pinMode (STEERING_VELOCITY_PIN, OUTPUT); //set all the relevant pins to output
@@ -43,7 +45,7 @@ void setup {
     Serial.println("Initialization Completed.");
 }
 
-void loop {
+void loop() {
     if(Serial.available())
         decodeInput(Serial.read());
 
@@ -56,7 +58,7 @@ void loop {
     }
 
     if (accelerationChanged) {
-        setAcceleration(acclerationGoal);
+        setAcceleration(accelerationGoal);
     }
 
     delay(10);
