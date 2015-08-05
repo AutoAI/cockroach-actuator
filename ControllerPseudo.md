@@ -1,48 +1,67 @@
 ```
 //PSEUDOCODE FOR CONTROLLING THE GO-KART
 
-<include servo lib>
+<include servo.h>
 
-int enginePin = 7;
-int gasPin = 6;
-int brakeVPin = 3;
-int brakeVPin = 3;
-int brakeVPin = 3;
+final int ENGINEPIN = 7;
+final int GASPIN = 6;
+
+final int BRAKEVPIN = 3;
+final int BRAKEDPIN = 2;
+final int BRAKESENSEPIN = 1;
+
+final int STEERINGVPIN = 5;
+final int STEERINGDPIN = 4;
+final int STEERINGSENSEPIN = 0;
+
+int steeringPos = 0;
+int brakingPos = 0;
+
+int steeringGoal = 512;
+int brakingGoal = 0;
+int accelerationGoal = 0;
+
+boolean steeringFlag = false;
+boolean brakingFlag = false;
+boolean accelerationFlag = false;
+
+int power = 255;
+int threshold = 25;
 
 setup {
-	start the serial com port
-	attach the gas servo
+	Servo gas; //create the servo object
+	gas.attach(GASPIN); //bind it to the throttle pin
+	
+	pinMode (STEERINGVPIN, OUTPUT); //set all the relevant pins to output
+	pinMode (STEERINGDPIN, OUTPUT);
+	pinMode (BRAKINGVPIN, OUTPUT);
+	pinMode (BRAKINGVPIN, OUTPUT);
+	pinMode (ENGINEPIN, OUTPUT);
+	
+	Serial.begin(9600); //start the serial transmitter
+	Serial.println("Initialization Completed.");
 }
 
 loop {
 	if(serial is available for reading)
-		decodeInput(read in serial);
+		decodeInput(Serial.read());
 		
 	if (steeringFlag) {
-		read in the steering sensor position
-		if (steering is not at the goal position) {
-			move towards the goal position
-			if we are at the goal position, stop and set the steeringFlag to false
+		doSteering(steeringGoal);
 		}
 	}
 	
 	if (brakingFlag) {
-		read in the prake sensor position
-		if (braking is not at the goal position) {
-			move towards the goal position
-			if we are at the goal position, stop and set the brakingFlag to false
+		doBraking(brakingGoal);
 		}
 	}
 	
 	if (accelerationFlag) {
-		if (accelerator is not at the goal position) {
-			increment the servo angle towards the goal
-			write the current angle to the servo
-			if we are at the goal position, set the accelerationFlag to false
+		doAcceleration(acclerationGoal);
 		}
 	}
 	
-	delay(something small like 10)
+	delay(10);
 }
 
 int decodeInput(int input) {
@@ -62,5 +81,36 @@ int decodeInput(int input) {
     Serial.println("Killing Engine!");
   }
 }
+
+void doSteering(int goal) {
+	steeringPos = analogRead(STEERINGSENSEPIN);
+	if (steeringPos < goal - threshold) { // always move toward the value
+    		digitalWrite(STEERINGDPIN, HIGH);
+    		analogWrite(STEERINGVPIN, power);
+  	} else if (steeringPos > goal + threshold) {
+    		digitalWrite(STEERINGDPIN, LOW);
+    		analogWrite(STEERINGVPIN, power);
+	} else {
+    		analogWrite(STEERINGVPIN, 0);
+    		steeringFlag = false;
+    	}
+}
+
+void doBraking(int goal) {
+	brakingPos = analogRead(BRAKINGSENSEPIN);
+	if (brakingPos < goal - threshold) { // always move toward the value
+    		digitalWrite(BRAKINGDPIN, HIGH);
+    		analogWrite(BRAKINGVPIN, power);
+  	} else if (brakingPos > goal + threshold) {
+    		digitalWrite(BRAKINGDPIN, LOW);
+    		analogWrite(BRAKINGVPIN, power);
+	} else {
+    		analogWrite(BRAKINGVPIN, 0);
+    		brakingFlag = false;
+    	}
+}
+
+void doAcceleration(int goal) {
 	
+}
 ```
