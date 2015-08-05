@@ -16,7 +16,7 @@ const int STEERING_SENSE_PIN = 0;
 int steeringPosition = 0;
 int brakingPosition = 0;
 
-int steeringGoal = 512;
+int steeringGoal = 0;
 int brakingGoal = 0;
 int accelerationGoal = 0;
 
@@ -84,30 +84,33 @@ void decodeInput(int input) {
 
 void setSteering(int goal) {
     steeringPosition = analogRead(STEERING_SENSE_PIN);
-    if (abs(steeringPosition-goal) <= threshold) {
-            analogWrite(STEERING_VELOCITY_PIN, 0);
-            steeringChanged = false;
-    } else if (steeringPosition < goal) { // always move toward the value
+    
+    if (steeringPosition < goal - threshold) { // always move toward the value
             digitalWrite(STEERING_DIRECTION_PIN, HIGH);
             analogWrite(STEERING_VELOCITY_PIN, power);
-    } else {
+    } else if (steeringPosition > goal + threshold) {
             digitalWrite(STEERING_DIRECTION_PIN, LOW);
             analogWrite(STEERING_VELOCITY_PIN, power);
-    } 
+    } else {
+            analogWrite(STEERING_VELOCITY_PIN, 0);
+            steeringChanged = false;
+    }
+    
 }
 
 void setBrake(int goal) {
     brakingPosition = analogRead(BRAKING_SENSE_PIN);
-    if (abs(brakingPosition-goal) <= threshold) {
-            analogWrite(BRAKING_VELOCITY_PIN, 0);
-            brakingChanged = false; 
-    } else if (brakingPosition < goal) { // always move toward the value
+            
+      if (brakingPosition < goal - threshold) { // always move toward the value
             digitalWrite(BRAKING_DIRECTION_PIN, HIGH);
             analogWrite(BRAKING_VELOCITY_PIN, power);
-    } else {
+    } else if (brakingPosition > goal + threshold) {
             digitalWrite(BRAKING_DIRECTION_PIN, LOW);
             analogWrite(BRAKING_VELOCITY_PIN, power);
-    } 
+    } else {
+            analogWrite(BRAKING_VELOCITY_PIN, 0);
+            brakingChanged = false; 
+    }
 }
 
 void setAcceleration(int goal) {
