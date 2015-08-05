@@ -86,7 +86,7 @@ void setSteering(int goal) {
 	if (abs(steeringPosition-goal) <= threshold) {
     		analogWrite(STEERING_VELOCITY_PIN, 0);
     		steeringChanged = false;
-	} else if (steeringPosition < goal - threshold) { // always move toward the value
+	} else if (steeringPosition < goal) { // always move toward the value
     		digitalWrite(STEERING_DIRECTION_PIN, HIGH);
     		analogWrite(STEERING_VELOCITY_PIN, power);
   	} else {
