@@ -5,12 +5,12 @@
 const int ENGINE_PIN = 7;
 const int GAS_PIN = 6;
 
-const int BRAKING_VELOCITY_PIN = 5;
-const int BRAKING_DIRECTION_PIN = 4;
+const int BRAKING_VELOCITY_PIN = 3;
+const int BRAKING_DIRECTION_PIN = 2;
 const int BRAKING_SENSE_PIN = 1;
 
-const int STEERING_VELOCITY_PIN = 3;
-const int STEERING_DIRECTION_PIN = 2;
+const int STEERING_VELOCITY_PIN = 5;
+const int STEERING_DIRECTION_PIN = 4;
 const int STEERING_SENSE_PIN = 0;
 
 int steeringPosition = 0;
@@ -46,6 +46,7 @@ void setup() {
 }
 
 void loop() {
+  
     if(Serial.available())
         decodeInput(Serial.read());
 
@@ -85,15 +86,19 @@ void decodeInput(int input) {
 void setSteering(int goal) {
     steeringPosition = analogRead(STEERING_SENSE_PIN);
     
+    
     if (steeringPosition < goal - threshold) { // always move toward the value
-            digitalWrite(STEERING_DIRECTION_PIN, HIGH);
-            analogWrite(STEERING_VELOCITY_PIN, power);
-    } else if (steeringPosition > goal + threshold) {
             digitalWrite(STEERING_DIRECTION_PIN, LOW);
             analogWrite(STEERING_VELOCITY_PIN, power);
+            Serial.println("Moving from <");
+    } else if (steeringPosition > goal + threshold) {
+            digitalWrite(STEERING_DIRECTION_PIN, HIGH);
+            analogWrite(STEERING_VELOCITY_PIN, power);
+            Serial.println("Moving from >");
     } else {
             analogWrite(STEERING_VELOCITY_PIN, 0);
             steeringChanged = false;
+            Serial.println("Flag is now false");
     }
     
 }
@@ -102,10 +107,10 @@ void setBrake(int goal) {
     brakingPosition = analogRead(BRAKING_SENSE_PIN);
             
       if (brakingPosition < goal - threshold) { // always move toward the value
-            digitalWrite(BRAKING_DIRECTION_PIN, HIGH);
+            digitalWrite(BRAKING_DIRECTION_PIN, LOW);
             analogWrite(BRAKING_VELOCITY_PIN, power);
     } else if (brakingPosition > goal + threshold) {
-            digitalWrite(BRAKING_DIRECTION_PIN, LOW);
+            digitalWrite(BRAKING_DIRECTION_PIN, HIGH);
             analogWrite(BRAKING_VELOCITY_PIN, power);
     } else {
             analogWrite(BRAKING_VELOCITY_PIN, 0);
